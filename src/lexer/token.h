@@ -1,8 +1,10 @@
 #pragma once
 
+#include <string>
+#include <string_view>
+
 enum class TokenType {
   // Special
-  EOF,
   ILLEGAL,
 
   // Literals
@@ -82,6 +84,17 @@ enum class TokenType {
   LARROW,    // <-
 };
 
+struct Pos {
+  int line, column;
+};
+
 struct Token {
   TokenType type;
+  std::string_view lexeme; // the raw source text
+  Pos pos;
+  // value storage (one of these is active depending on type)
+  double number_value;
+  std::string value;
 };
+
+TokenType lookup_indent(std::string_view s);

@@ -23,7 +23,7 @@ add_executable(mora src/main.cpp)
 target_link_libraries(mora PRIVATE mora_lib)
 
 # Tests
-find_package(Catch2 3 QUITE)
+find_package(Catch2 3 QUIET)
 if(NOT Catch2_FOUND)
   include(FetchContent)
   FetchContent_Declare(
@@ -36,7 +36,7 @@ endif()
 
 file(GLOB_RECURSE TEST_SOURCES tests/*.cpp)
 add_executable(mora_tests ${TEST_SOURCES})
-target_link_libraries(mora_tests PRIVATE mora_lib Catch::Catch2WithMain)
+target_link_libraries(mora_tests PRIVATE mora_lib Catch2::Catch2WithMain)
 target_compile_options(mora_tests PRIVATE -Wall -Wextra -Wpedantic)
 
 include(CTest)

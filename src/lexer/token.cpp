@@ -18,7 +18,7 @@ TokenType lookup_indent(std::string_view s) {
   return it != kw.end() ? it->second : TokenType::IDENT;
 };
 
-constexpr std::string_view string(TokenType type) {
+std::string_view to_string(TokenType type) {
   switch (type) {
   case TokenType::ILLEGAL:
     return "ILLEGAL";
@@ -117,7 +117,7 @@ constexpr std::string_view string(TokenType type) {
   case TokenType::COMMA:
     return ",";
   case TokenType::COLON:
-    return ";";
+    return ":";
   case TokenType::DCOLON:
     return "::";
   case TokenType::SEMICOLON:

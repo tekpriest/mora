@@ -98,3 +98,4 @@ struct Token {
 };
 
 TokenType lookup_indent(std::string_view s);
+std::string_view to_string(TokenType type);

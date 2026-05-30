@@ -142,7 +142,6 @@ std::string_view to_string(TokenType type) {
     return "|>";
   case TokenType::LARROW:
     return "<-";
-    break;
   }
 
   return "UNKNOWN";

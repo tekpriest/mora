@@ -5,6 +5,7 @@
 
 enum class TokenType {
   // Special
+  END_OF_FILE,
   ILLEGAL,
 
   // Literals
@@ -94,7 +95,7 @@ struct Token {
   Pos pos;
   // value storage (one of these is active depending on type)
   double number_value;
-  std::string value;
+  std::string string_value;
 };
 
 TokenType lookup_indent(std::string_view s);

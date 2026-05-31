@@ -1,5 +1,4 @@
 #include "token.h"
-#include <string>
 #include <string_view>
 #include <unordered_map>
 
@@ -20,6 +19,8 @@ TokenType lookup_indent(std::string_view s) {
 
 std::string_view to_string(TokenType type) {
   switch (type) {
+  case TokenType::END_OF_FILE:
+    return "EOF";
   case TokenType::ILLEGAL:
     return "ILLEGAL";
   case TokenType::IDENT:

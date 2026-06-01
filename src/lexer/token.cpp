@@ -2,7 +2,7 @@
 #include <string_view>
 #include <unordered_map>
 
-TokenType lookup_indent(std::string_view s) {
+TokenType lookup_ident(std::string_view s) {
   static const std::unordered_map<std::string_view, TokenType> kw = {
       {"let", TokenType::LET},     {"fn", TokenType::FN},
       {"if", TokenType::IF},       {"else", TokenType::ELSE},
@@ -11,8 +11,8 @@ TokenType lookup_indent(std::string_view s) {
       {"impl", TokenType::IMPL},   {"for", TokenType::FOR},
       {"in", TokenType::IN},       {"return", TokenType::RETURN},
       {"use", TokenType::USE},     {"with", TokenType::WITH},
-      {"macro", TokenType::MACRO},
-  };
+      {"macro", TokenType::MACRO}, {"true", TokenType::BOOL},
+      {"false", TokenType::BOOL}};
   auto it = kw.find(s);
   return it != kw.end() ? it->second : TokenType::IDENT;
 };

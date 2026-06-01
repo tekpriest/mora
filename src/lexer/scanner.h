@@ -13,9 +13,6 @@ struct Scan {
 };
 
 class Scanner {
-  Scanner(std::string_view source);
-  ~Scanner();
-
 private:
   std::string_view source;
   size_t current{0};
@@ -48,4 +45,6 @@ private:
 
 public:
   Scan scan();
+  Scanner(std::string_view source);
+  ~Scanner();
 };

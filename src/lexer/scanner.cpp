@@ -3,14 +3,11 @@
 #include <string>
 #include <string_view>
 
-Scanner::Scanner(std::string_view source) {
-  source = source;
-  current = 0;
-  pos = Pos{line = 1, column = 1};
-}
+Scanner::Scanner(std::string_view source)
+    : source(source), current(0), pos{1, 1} {}
 
 Scan Scanner::scan() {
-  if (!isAtEnd()) {
+  while (!isAtEnd()) {
     scanToken();
   }
   emit(TokenType::END_OF_FILE, "", pos);
@@ -25,32 +22,46 @@ void Scanner::scanToken() {
   switch (c) {
   case '(':
     emitToken(TokenType::LPAREN);
+    break;
   case ')':
     emitToken(TokenType::RPAREN);
+    break;
   case '{':
     emitToken(TokenType::LBRACE);
+    break;
   case '}':
     emitToken(TokenType::RBRACE);
+    break;
   case '[':
     emitToken(TokenType::LBRACKET);
+    break;
   case ']':
     emitToken(TokenType::RBRACKET);
+    break;
   case ',':
     emitToken(TokenType::COMMA);
+    break;
   case ';':
     emitToken(TokenType::SEMICOLON);
+    break;
   case '%':
     emitToken(TokenType::PERCENT);
+    break;
   case '^':
     emitToken(TokenType::CARET);
+    break;
   case '@':
     emitToken(TokenType::AT);
+    break;
   case '?':
     emitToken(TokenType::QUESTION);
+    break;
   case '&':
     emitToken(TokenType::AMP);
+    break;
   case '+':
     match('=') ? emitToken(TokenType::PLUS_ASSIGN) : emitToken(TokenType::PLUS);
+    break;
   case '-':
     if (match('>')) {
       emitToken(TokenType::ARROW);
@@ -59,10 +70,13 @@ void Scanner::scanToken() {
     } else {
       emitToken(TokenType::MINUS);
     }
+    break;
   case '*':
     emitToken(TokenType::STAR);
+    break;
   case '!':
     match('=') ? emitToken(TokenType::NEQ) : emitToken(TokenType::BANG);
+    break;
   case '=':
     if (match('=')) {
       emitToken(TokenType::EQ);
@@ -71,6 +85,7 @@ void Scanner::scanToken() {
     } else {
       emitToken(TokenType::ASSIGN);
     }
+    break;
 
   case '<':
     if (match('=')) {
@@ -80,20 +95,26 @@ void Scanner::scanToken() {
     } else {
       emitToken(TokenType::LT);
     }
+    break;
 
   case '>':
     match('=') ? emitToken(TokenType::GTE) : emitToken(TokenType::GT);
+    break;
 
   case '|':
     match('>') ? emitToken(TokenType::PIPE_OP) : emitToken(TokenType::PIPE);
+    break;
 
   case ':':
     match(':') ? emitToken(TokenType::DCOLON) : emitToken(TokenType::COLON);
+    break;
 
   case '.':
     match('.') ? emitToken(TokenType::DOTDOT) : emitToken(TokenType::DOT);
+    break;
   case '$':
     emitToken(TokenType::DOLLAR);
+    break;
   // comments
   case '/':
     if (match('/')) {
@@ -106,14 +127,22 @@ void Scanner::scanToken() {
     } else {
       emitToken(TokenType::SLASH);
     }
+    break;
 
   case ' ':
+    break;
   case '\t':
+    break;
   case '\r':
+    break;
   case '\n':
+    line++;
+    column = 0;
+    break;
 
   case '"':
     scanString();
+    break;
   case 'r':
     if (peek() == '#' && peekNext() == '"') {
       advance(); // #
@@ -122,6 +151,7 @@ void Scanner::scanToken() {
     } else {
       scanIdent('r');
     }
+    break;
 
   case 'f':
     if (peek() == '#' && peekNext() == '"') {
@@ -130,6 +160,7 @@ void Scanner::scanToken() {
     } else {
       scanIdent('f');
     }
+    break;
 
   default:
     if (isDigit(c)) {
@@ -138,7 +169,7 @@ void Scanner::scanToken() {
     if (isAlpha(c)) {
       scanIdent(c);
     }
-    addError(&"unexpected character "[c]);
+    addError("unexpected character: " + std::string(1, static_cast<char>(c)));
     emitToken(TokenType::ILLEGAL);
   }
 }

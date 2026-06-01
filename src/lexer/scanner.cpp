@@ -4,7 +4,9 @@
 #include <string_view>
 
 Scanner::Scanner(std::string_view source)
-    : source(source), current(0), pos{1, 1} {}
+    : source(source), current(0), pos{1, 1}, line(1), column(0) {}
+
+Scanner::~Scanner() = default;
 
 Scan Scanner::scan() {
   while (!isAtEnd()) {
@@ -165,12 +167,12 @@ void Scanner::scanToken() {
   default:
     if (isDigit(c)) {
       scanNumber(c);
-    }
-    if (isAlpha(c)) {
+    } else if (isAlpha(c)) {
       scanIdent(c);
+    } else {
+      addError("unexpected character: " + std::string(1, static_cast<char>(c)));
+      emitToken(TokenType::ILLEGAL);
     }
-    addError("unexpected character: " + std::string(1, static_cast<char>(c)));
-    emitToken(TokenType::ILLEGAL);
   }
 }
 
@@ -232,7 +234,7 @@ void Scanner::scanIdent(char32_t c) {
   while (!isAtEnd() && isAlphaNumeric(peek())) {
     word += advance();
   }
-  TokenType type = lookup_indent(word);
+  TokenType type = lookup_ident(word);
   emit(type, word, pos);
 }
 void Scanner::scanBlockComment() {
@@ -265,19 +267,26 @@ void Scanner::scanString() {
         return;
       }
 
-      switch (advance()) {
+      char32_t escaped = advance();
+      switch (escaped) {
       case 'n':
         word += '\n';
+        break;
       case 't':
         word += '\t';
+        break;
       case '\\':
         word += '\\';
+        break;
       case '"':
         word += '"';
+        break;
       case 'r':
         word += '\r';
+        break;
       default:
-        word += ch;
+        word += escaped;
+        break;
       }
     } else {
       word += ch;

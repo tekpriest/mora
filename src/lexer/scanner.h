@@ -28,7 +28,7 @@ private:
   char32_t peekNext();
   char32_t advance();
   bool isAtEnd();
-  bool match(TokenType type);
+  bool match(char32_t c);
   void scanToken();
   void emit(TokenType type, std::string_view lexeme, Pos pos);
   void emit(TokenType type, std::string_view lexeme, Pos pos, double number);
@@ -38,8 +38,8 @@ private:
   void emitToken(TokenType type);
   void scanBlockComment();
   void scanString();
-  void scanRawString();
-  void scanFmtString();
+  void scanRawString(Pos pos);
+  void scanFmtString(Pos pos);
   void scanIdent(char32_t c);
   bool isDigit(char32_t c);
   bool isAlpha(char32_t c);

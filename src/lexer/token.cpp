@@ -17,7 +17,7 @@ TokenType lookup_ident(std::string_view s) {
   return it != kw.end() ? it->second : TokenType::IDENT;
 };
 
-std::string_view to_string(TokenType type) {
+std::string to_string(TokenType type) {
   switch (type) {
   case TokenType::END_OF_FILE:
     return "EOF";

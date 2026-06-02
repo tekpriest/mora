@@ -177,7 +177,7 @@ void Scanner::scanToken() {
 }
 
 void Scanner::emitToken(TokenType type) {
-  std::string_view tokenString = to_string(type);
+  std::string tokenString = to_string(type);
   emit(type, tokenString, pos);
 }
 
@@ -212,16 +212,15 @@ char32_t Scanner::advance() {
 
   return ch;
 }
-void Scanner::emit(TokenType type, std::string_view lexeme, Pos pos) {
+void Scanner::emit(TokenType type, std::string lexeme, Pos pos) {
   tokens.push_back(Token{.type = type, .lexeme = lexeme, .pos = pos});
 }
-void Scanner::emit(TokenType type, std::string_view lexeme, Pos pos,
-                   double number) {
+void Scanner::emit(TokenType type, std::string lexeme, Pos pos, double number) {
   Token token =
       Token{.type = type, .lexeme = lexeme, .pos = pos, .number_value = number};
   tokens.push_back(token);
 }
-void Scanner::emit(TokenType type, std::string_view lexeme, Pos pos,
+void Scanner::emit(TokenType type, std::string lexeme, Pos pos,
                    std::string value) {
   Token token =
       Token{.type = type, .lexeme = lexeme, .pos = pos, .string_value = value};

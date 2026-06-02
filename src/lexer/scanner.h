@@ -27,9 +27,9 @@ private:
   bool isAtEnd();
   bool match(char32_t c);
   void scanToken();
-  void emit(TokenType type, std::string_view lexeme, Pos pos);
-  void emit(TokenType type, std::string_view lexeme, Pos pos, double number);
-  void emit(TokenType type, std::string_view lexeme, Pos pos,
+  void emit(TokenType type, std::string lexeme, Pos pos);
+  void emit(TokenType type, std::string lexeme, Pos pos, double number);
+  void emit(TokenType type, std::string lexeme, Pos pos,
             std::string value);
   void addError(std::string msg);
   void emitToken(TokenType type);

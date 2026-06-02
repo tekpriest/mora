@@ -91,7 +91,7 @@ struct Pos {
 
 struct Token {
   TokenType type;
-  std::string_view lexeme; // the raw source text
+  std::string lexeme; // the raw source text
   Pos pos;
   // value storage (one of these is active depending on type)
   double number_value;
@@ -99,4 +99,4 @@ struct Token {
 };
 
 TokenType lookup_ident(std::string_view s);
-std::string_view to_string(TokenType type);
+std::string to_string(TokenType type);

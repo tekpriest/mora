@@ -2,8 +2,6 @@
 
 #include "token.h"
 #include <cstddef>
-#include <cstdint>
-#include <queue>
 #include <string_view>
 #include <vector>
 
@@ -16,10 +14,9 @@ class Scanner {
 private:
   std::string_view source;
   size_t current{0};
-  Pos pos{1, 1};
+  Pos pos;
   std::vector<Token> tokens;
   std::vector<std::string> errors;
-  int line, column;
 
   char32_t peek();
   char32_t peekNext();
@@ -29,10 +26,9 @@ private:
   void scanToken();
   void emit(TokenType type, std::string lexeme, Pos pos);
   void emit(TokenType type, std::string lexeme, Pos pos, double number);
-  void emit(TokenType type, std::string lexeme, Pos pos,
-            std::string value);
+  void emit(TokenType type, std::string lexeme, Pos pos, std::string value);
   void addError(std::string msg);
-  void emitToken(TokenType type);
+  void emitToken(TokenType type, Pos pos);
   void scanBlockComment();
   void scanString();
   void scanRawString(Pos pos);

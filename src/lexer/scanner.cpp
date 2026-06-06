@@ -4,7 +4,7 @@
 #include <string_view>
 
 Scanner::Scanner(std::string_view source)
-    : source(source), current(0), pos{1, 1}, line(1), column(0) {}
+    : source(source), current(0), pos{1, 0} {}
 
 Scanner::~Scanner() = default;
 
@@ -18,104 +18,110 @@ Scan Scanner::scan() {
 }
 
 void Scanner::scanToken() {
-  pos = Pos{.line = line, .column = column};
+  Pos start = pos;
   char32_t c = advance();
 
   switch (c) {
   case '(':
-    emitToken(TokenType::LPAREN);
+    emitToken(TokenType::LPAREN, start);
     break;
   case ')':
-    emitToken(TokenType::RPAREN);
+    emitToken(TokenType::RPAREN, start);
     break;
   case '{':
-    emitToken(TokenType::LBRACE);
+    emitToken(TokenType::LBRACE, start);
     break;
   case '}':
-    emitToken(TokenType::RBRACE);
+    emitToken(TokenType::RBRACE, start);
     break;
   case '[':
-    emitToken(TokenType::LBRACKET);
+    emitToken(TokenType::LBRACKET, start);
     break;
   case ']':
-    emitToken(TokenType::RBRACKET);
+    emitToken(TokenType::RBRACKET, start);
     break;
   case ',':
-    emitToken(TokenType::COMMA);
+    emitToken(TokenType::COMMA, start);
     break;
   case ';':
-    emitToken(TokenType::SEMICOLON);
+    emitToken(TokenType::SEMICOLON, start);
     break;
   case '%':
-    emitToken(TokenType::PERCENT);
+    emitToken(TokenType::PERCENT, start);
     break;
   case '^':
-    emitToken(TokenType::CARET);
+    emitToken(TokenType::CARET, start);
     break;
   case '@':
-    emitToken(TokenType::AT);
+    emitToken(TokenType::AT, start);
     break;
   case '?':
-    emitToken(TokenType::QUESTION);
+    emitToken(TokenType::QUESTION, start);
     break;
   case '&':
-    emitToken(TokenType::AMP);
+    emitToken(TokenType::AMP, start);
     break;
   case '+':
-    match('=') ? emitToken(TokenType::PLUS_ASSIGN) : emitToken(TokenType::PLUS);
+    match('=') ? emitToken(TokenType::PLUS_ASSIGN, start)
+               : emitToken(TokenType::PLUS, start);
     break;
   case '-':
     if (match('>')) {
-      emitToken(TokenType::ARROW);
+      emitToken(TokenType::ARROW, start);
     } else if (match('=')) {
-      emitToken(TokenType::MINUS_ASSIGN);
+      emitToken(TokenType::MINUS_ASSIGN, start);
     } else {
-      emitToken(TokenType::MINUS);
+      emitToken(TokenType::MINUS, start);
     }
     break;
   case '*':
-    emitToken(TokenType::STAR);
+    emitToken(TokenType::STAR, start);
     break;
   case '!':
-    match('=') ? emitToken(TokenType::NEQ) : emitToken(TokenType::BANG);
+    match('=') ? emitToken(TokenType::NEQ, start)
+               : emitToken(TokenType::BANG, start);
     break;
   case '=':
     if (match('=')) {
-      emitToken(TokenType::EQ);
+      emitToken(TokenType::EQ, start);
     } else if (match('>')) {
-      emitToken(TokenType::FAT_ARROW);
+      emitToken(TokenType::FAT_ARROW, start);
     } else {
-      emitToken(TokenType::ASSIGN);
+      emitToken(TokenType::ASSIGN, start);
     }
     break;
 
   case '<':
     if (match('=')) {
-      emitToken(TokenType::LTE);
+      emitToken(TokenType::LTE, start);
     } else if (match('-')) {
-      emitToken(TokenType::LARROW);
+      emitToken(TokenType::LARROW, start);
     } else {
-      emitToken(TokenType::LT);
+      emitToken(TokenType::LT, start);
     }
     break;
 
   case '>':
-    match('=') ? emitToken(TokenType::GTE) : emitToken(TokenType::GT);
+    match('=') ? emitToken(TokenType::GTE, start)
+               : emitToken(TokenType::GT, start);
     break;
 
   case '|':
-    match('>') ? emitToken(TokenType::PIPE_OP) : emitToken(TokenType::PIPE);
+    match('>') ? emitToken(TokenType::PIPE_OP, start)
+               : emitToken(TokenType::PIPE, start);
     break;
 
   case ':':
-    match(':') ? emitToken(TokenType::DCOLON) : emitToken(TokenType::COLON);
+    match(':') ? emitToken(TokenType::DCOLON, start)
+               : emitToken(TokenType::COLON, start);
     break;
 
   case '.':
-    match('.') ? emitToken(TokenType::DOTDOT) : emitToken(TokenType::DOT);
+    match('.') ? emitToken(TokenType::DOTDOT, start)
+               : emitToken(TokenType::DOT, start);
     break;
   case '$':
-    emitToken(TokenType::DOLLAR);
+    emitToken(TokenType::DOLLAR, start);
     break;
   // comments
   case '/':
@@ -127,7 +133,7 @@ void Scanner::scanToken() {
     } else if (match('*')) {
       scanBlockComment();
     } else {
-      emitToken(TokenType::SLASH);
+      emitToken(TokenType::SLASH, start);
     }
     break;
 
@@ -138,8 +144,8 @@ void Scanner::scanToken() {
   case '\r':
     break;
   case '\n':
-    line++;
-    column = 0;
+    pos.line++;
+    pos.column = 0;
     break;
 
   case '"':
@@ -171,12 +177,12 @@ void Scanner::scanToken() {
       scanIdent(c);
     } else {
       addError("unexpected character: " + std::string(1, static_cast<char>(c)));
-      emitToken(TokenType::ILLEGAL);
+      emitToken(TokenType::ILLEGAL, start);
     }
   }
 }
 
-void Scanner::emitToken(TokenType type) {
+void Scanner::emitToken(TokenType type, Pos pos) {
   std::string tokenString = to_string(type);
   emit(type, tokenString, pos);
 }
@@ -184,8 +190,9 @@ void Scanner::emitToken(TokenType type) {
 bool Scanner::isAtEnd() { return current >= source.size(); }
 
 bool Scanner::match(char32_t c) {
-  char s = source[current];
-  if (isAtEnd() || source[current] != c) {
+  auto s = static_cast<char32_t>(source[current]);
+
+  if (isAtEnd() || s != c) {
     return false;
   }
   advance();
@@ -200,14 +207,15 @@ char32_t Scanner::peekNext() {
 
   return source[current + 1];
 }
+
 char32_t Scanner::advance() {
   char32_t ch = source[current];
   current++;
   if (ch == '\n') {
-    line++;
-    column = 1;
+    pos.line++;
+    pos.column = 0;
   } else {
-    column++;
+    pos.column++;
   }
 
   return ch;
@@ -226,8 +234,8 @@ void Scanner::emit(TokenType type, std::string lexeme, Pos pos,
       Token{.type = type, .lexeme = lexeme, .pos = pos, .string_value = value};
   tokens.push_back(token);
 }
+
 void Scanner::scanIdent(char32_t c) {
-  // TODO: implement scan ident
   std::string word;
   word += c;
   while (!isAtEnd() && isAlphaNumeric(peek())) {
@@ -236,6 +244,7 @@ void Scanner::scanIdent(char32_t c) {
   TokenType type = lookup_ident(word);
   emit(type, word, pos);
 }
+
 void Scanner::scanBlockComment() {
   int depth{1};
   while (!isAtEnd() && depth > 0) {

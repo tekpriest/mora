@@ -9,30 +9,30 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(mora_lib STATIC
   src/lexer/token.cpp
   src/lexer/scanner.cpp
-  src/parser/parser.cpp
-  src/ast/ast.cpp
-  src/interpreter/interpreter.cpp
-  src/arena/arena.cpp
+  # src/parser/parser.cpp
+  # src/ast/ast.cpp
+  # src/interpreter/interpreter.cpp
+  # src/arena/arena.cpp
 )
 
 target_include_directories(mora_lib PUBLIC src)
 target_compile_options(mora_lib PRIVATE -Wall -Wextra -Wpedantic)
 
 # Main executables
-add_executable(mora src/main.cpp)
-target_link_libraries(mora PRIVATE mora_lib)
+# add_executable(mora src/main.cpp)
+# target_link_libraries(mora PRIVATE mora_lib)
 
 # Tests
-find_package(Catch2 3 QUIET)
-if(NOT Catch2_FOUND)
-  include(FetchContent)
-  FetchContent_Declare(
+# find_package(Catch2 3 QUIET)
+# if(NOT Catch2_FOUND)
+include(FetchContent)
+FetchContent_Declare(
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v3.7.1
+    GIT_TAG v3.15.0
   )
-  FetchContent_MakeAvailable(Catch2)
-endif()
+FetchContent_MakeAvailable(Catch2)
+# endif()
 
 file(GLOB_RECURSE TEST_SOURCES tests/*.cpp)
 add_executable(mora_tests ${TEST_SOURCES})
@@ -41,3 +41,5 @@ target_compile_options(mora_tests PRIVATE -Wall -Wextra -Wpedantic)
 
 include(CTest)
 add_test(NAME mora_tests COMMAND mora_tests)
+# Show failures inline
+set(CTEST_OUTPUT_ON_FAILURE ON)

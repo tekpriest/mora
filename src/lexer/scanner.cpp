@@ -4,7 +4,7 @@
 #include <string_view>
 
 Scanner::Scanner(std::string_view source)
-    : source(source), current(0), pos{1, 0} {}
+    : source(source), cursor(0), pos{1, 0} {}
 
 Scanner::~Scanner() = default;
 
@@ -187,10 +187,10 @@ void Scanner::emitToken(TokenType type, Pos pos) {
   emit(type, tokenString, pos);
 }
 
-bool Scanner::isAtEnd() { return current >= source.size(); }
+bool Scanner::isAtEnd() { return cursor >= source.size(); }
 
 bool Scanner::match(char32_t c) {
-  auto s = static_cast<char32_t>(source[current]);
+  auto s = static_cast<char32_t>(source[cursor]);
 
   if (isAtEnd() || s != c) {
     return false;
@@ -199,18 +199,18 @@ bool Scanner::match(char32_t c) {
   return true;
 }
 void Scanner::addError(std::string msg) { errors.push_back(msg); }
-char32_t Scanner::peek() { return isAtEnd() ? 0 : source[current]; }
+char32_t Scanner::peek() { return isAtEnd() ? 0 : source[cursor]; }
 char32_t Scanner::peekNext() {
-  if (current + 1 >= source.size()) {
+  if (cursor + 1 >= source.size()) {
     return 0;
   }
 
-  return source[current + 1];
+  return source[cursor + 1];
 }
 
 char32_t Scanner::advance() {
-  char32_t ch = source[current];
-  current++;
+  char32_t ch = source[cursor];
+  cursor++;
   if (ch == '\n') {
     pos.line++;
     pos.column = 0;

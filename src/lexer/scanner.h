@@ -13,7 +13,7 @@ struct Scan {
 class Scanner {
 private:
   std::string_view source;
-  size_t current{0};
+  size_t cursor{0};
   Pos pos;
   std::vector<Token> tokens;
   std::vector<std::string> errors;

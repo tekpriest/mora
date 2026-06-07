@@ -98,5 +98,5 @@ struct Token {
   std::string string_value;
 };
 
-TokenType lookup_ident(std::string_view s);
-std::string to_string(TokenType type);
+TokenType lookupIdent(std::string_view s);
+std::string toString(TokenType type);

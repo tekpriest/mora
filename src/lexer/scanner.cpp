@@ -144,37 +144,36 @@ void Scanner::scanToken() {
   case '\r':
     break;
   case '\n':
-    pos.line++;
-    pos.column = 0;
     break;
 
   case '"':
-    scanString();
+    scanString(start);
     break;
   case 'r':
     if (peek() == '#' && peekNext() == '"') {
       advance(); // #
       advance(); // "
-      scanRawString(pos);
+      scanRawString(start);
     } else {
-      scanIdent('r');
+      scanIdent('r', start);
     }
     break;
 
   case 'f':
     if (peek() == '#' && peekNext() == '"') {
       advance(); // #
-      scanFmtString(pos);
+      advance(); // "
+      scanFmtString(start);
     } else {
-      scanIdent('f');
+      scanIdent('f', start);
     }
     break;
 
   default:
     if (isDigit(c)) {
-      scanNumber(c);
+      scanNumber(c, start);
     } else if (isAlpha(c)) {
-      scanIdent(c);
+      scanIdent(c, start);
     } else {
       addError("unexpected character: " + std::string(1, static_cast<char>(c)));
       emitToken(TokenType::ILLEGAL, start);
@@ -183,7 +182,7 @@ void Scanner::scanToken() {
 }
 
 void Scanner::emitToken(TokenType type, Pos pos) {
-  std::string tokenString = to_string(type);
+  std::string tokenString = toString(type);
   emit(type, tokenString, pos);
 }
 
@@ -235,13 +234,13 @@ void Scanner::emit(TokenType type, std::string lexeme, Pos pos,
   tokens.push_back(token);
 }
 
-void Scanner::scanIdent(char32_t c) {
+void Scanner::scanIdent(char32_t c, Pos pos) {
   std::string word;
   word += c;
   while (!isAtEnd() && isAlphaNumeric(peek())) {
     word += advance();
   }
-  TokenType type = lookup_ident(word);
+  TokenType type = lookupIdent(word);
   emit(type, word, pos);
 }
 
@@ -265,7 +264,7 @@ void Scanner::scanBlockComment() {
     addError("unterminated block comment");
   }
 }
-void Scanner::scanString() {
+void Scanner::scanString(Pos pos) {
   std::string word;
   while (!isAtEnd() && peek() != '"') {
     char32_t ch = advance();
@@ -337,7 +336,7 @@ bool Scanner::isAlpha(char32_t c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 bool Scanner::isAlphaNumeric(char32_t c) { return isAlpha(c) || isDigit(c); }
-void Scanner::scanNumber(char32_t c) {
+void Scanner::scanNumber(char32_t c, Pos pos) {
   std::string word;
   word += c;
 

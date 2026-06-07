@@ -2,7 +2,7 @@
 #include <string_view>
 #include <unordered_map>
 
-TokenType lookup_ident(std::string_view s) {
+TokenType lookupIdent(std::string_view s) {
   static const std::unordered_map<std::string_view, TokenType> kw = {
       {"let", TokenType::LET},     {"fn", TokenType::FN},
       {"if", TokenType::IF},       {"else", TokenType::ELSE},
@@ -17,7 +17,7 @@ TokenType lookup_ident(std::string_view s) {
   return it != kw.end() ? it->second : TokenType::IDENT;
 };
 
-std::string to_string(TokenType type) {
+std::string toString(TokenType type) {
   switch (type) {
   case TokenType::END_OF_FILE:
     return "EOF";

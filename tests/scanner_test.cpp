@@ -172,3 +172,26 @@ TEST_CASE("Scanner: line and column tracking", "[scanner]") {
   REQUIRE(result.tokens[1].pos.line == 2);
   REQUIRE(result.tokens[1].pos.column == 2);
 }
+
+TEST_CASE("Scanner: complex position tracking", "[scanner]") {
+  auto result = scan_source("let x = 1;\n  f#\"hello {x}\"\n  r#\"raw\"#");
+  REQUIRE(result.errors.empty());
+
+  // let
+  REQUIRE(result.tokens[0].pos.line == 1);
+  REQUIRE(result.tokens[0].pos.column == 0);
+
+  // x
+  REQUIRE(result.tokens[1].pos.line == 1);
+  REQUIRE(result.tokens[1].pos.column == 4);
+
+  // f#"hello {x}"
+  REQUIRE(result.tokens[5].type == TokenType::FMTSTR);
+  REQUIRE(result.tokens[5].pos.line == 2);
+  REQUIRE(result.tokens[5].pos.column == 2);
+
+  // r#"raw"#
+  REQUIRE(result.tokens[6].type == TokenType::RAWSTR);
+  REQUIRE(result.tokens[6].pos.line == 3);
+  REQUIRE(result.tokens[6].pos.column == 2);
+}

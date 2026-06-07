@@ -30,14 +30,14 @@ private:
   void addError(std::string msg);
   void emitToken(TokenType type, Pos pos);
   void scanBlockComment();
-  void scanString();
+  void scanString(Pos pos);
   void scanRawString(Pos pos);
   void scanFmtString(Pos pos);
-  void scanIdent(char32_t c);
+  void scanIdent(char32_t c, Pos pos);
   bool isDigit(char32_t c);
   bool isAlpha(char32_t c);
   bool isAlphaNumeric(char32_t c);
-  void scanNumber(char32_t c);
+  void scanNumber(char32_t c, Pos pos);
 
 public:
   Scan scan();
